@@ -1,22 +1,53 @@
 local UILibrary = {}
 
-function UILibrary:CreateWindow(title)
-    local UserInputService = game:GetService("UserInputService")
+-- Function to make the UI draggable
+local function makeDraggable(frame, dragHandle)
+    local UIS = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos
 
+    dragHandle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    dragHandle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+-- CreateWindow function
+function UILibrary:CreateWindow(title)
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local MainFrameCorner = Instance.new("UICorner")
     local TopBar = Instance.new("Frame")
-    local TopBarCorner = Instance.new("UICorner")
-    local TopBarBorder = Instance.new("Frame")
     local CloseButton = Instance.new("TextButton")
     local MinimizeButton = Instance.new("TextButton")
     local Sidebar = Instance.new("Frame")
-    local SidebarCorner = Instance.new("UICorner")
-    local SidebarBorder = Instance.new("Frame")
     local ContentFrame = Instance.new("Frame")
-    local ContentFrameCorner = Instance.new("UICorner")
     local TitleLabel = Instance.new("TextLabel")
 
     -- ScreenGui
@@ -26,8 +57,8 @@ function UILibrary:CreateWindow(title)
     -- MainFrame
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    MainFrame.BackgroundTransparency = 0.5
+    MainFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+    MainFrame.BackgroundTransparency = 0.3
     MainFrame.Size = UDim2.new(0, 600, 0, 400)
     MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
     MainFrame.BorderSizePixel = 0
@@ -39,23 +70,9 @@ function UILibrary:CreateWindow(title)
     -- TopBar
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
-    TopBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    TopBar.BackgroundTransparency = 0.3
+    TopBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     TopBar.Size = UDim2.new(1, 0, 0, 40)
     TopBar.BorderSizePixel = 0
-
-    -- TopBar Corner
-    TopBarCorner.Parent = TopBar
-    TopBarCorner.CornerRadius = UDim.new(0, 10)
-
-    -- TopBar Border
-    TopBarBorder.Name = "TopBarBorder"
-    TopBarBorder.Parent = TopBar
-    TopBarBorder.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    TopBarBorder.BackgroundTransparency = 0.8
-    TopBarBorder.Size = UDim2.new(1, 0, 0, 1)
-    TopBarBorder.Position = UDim2.new(0, 0, 1, 0)
-    TopBarBorder.BorderSizePixel = 0
 
     -- Close Button
     CloseButton.Name = "CloseButton"
@@ -94,37 +111,18 @@ function UILibrary:CreateWindow(title)
     -- Sidebar
     Sidebar.Name = "Sidebar"
     Sidebar.Parent = MainFrame
-    Sidebar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    Sidebar.BackgroundTransparency = 0.5
+    Sidebar.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
     Sidebar.Size = UDim2.new(0, 150, 1, -40)
     Sidebar.Position = UDim2.new(0, 0, 0, 40)
     Sidebar.BorderSizePixel = 0
-
-    -- Sidebar Corner
-    SidebarCorner.Parent = Sidebar
-    SidebarCorner.CornerRadius = UDim.new(0, 10)
-
-    -- Sidebar Border
-    SidebarBorder.Name = "SidebarBorder"
-    SidebarBorder.Parent = Sidebar
-    SidebarBorder.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    SidebarBorder.BackgroundTransparency = 0.8
-    SidebarBorder.Size = UDim2.new(0, 1, 1, 0)
-    SidebarBorder.Position = UDim2.new(1, 0, 0, 0)
-    SidebarBorder.BorderSizePixel = 0
 
     -- Content Frame
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = MainFrame
     ContentFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    ContentFrame.BackgroundTransparency = 0.5
     ContentFrame.Size = UDim2.new(1, -150, 1, -40)
     ContentFrame.Position = UDim2.new(0, 150, 0, 40)
     ContentFrame.BorderSizePixel = 0
-
-    -- ContentFrame Corner
-    ContentFrameCorner.Parent = ContentFrame
-    ContentFrameCorner.CornerRadius = UDim.new(0, 10)
 
     -- Title Label
     TitleLabel.Name = "TitleLabel"
@@ -137,42 +135,13 @@ function UILibrary:CreateWindow(title)
     TitleLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Dragging Logic
-    TopBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    TopBar.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            MainFrame.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
+    -- Make MainFrame draggable using TopBar
+    makeDraggable(MainFrame, TopBar)
 
     self.MainFrame = MainFrame
     self.Sidebar = Sidebar
     self.ContentFrame = ContentFrame
-    self.Tabs = {}
     return self
 end
+
+return UILibrary
