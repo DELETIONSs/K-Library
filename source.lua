@@ -3,11 +3,15 @@ local UILibrary = {}
 function UILibrary:CreateWindow(title)
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
+    local MainFrameCorner = Instance.new("UICorner")
     local TopBar = Instance.new("Frame")
+    local TopBarCorner = Instance.new("UICorner")
     local CloseButton = Instance.new("TextButton")
     local MinimizeButton = Instance.new("TextButton")
     local Sidebar = Instance.new("Frame")
+    local SidebarCorner = Instance.new("UICorner")
     local ContentFrame = Instance.new("Frame")
+    local ContentFrameCorner = Instance.new("UICorner")
     local UIListLayout = Instance.new("UIListLayout")
     local TitleLabel = Instance.new("TextLabel")
 
@@ -24,6 +28,10 @@ function UILibrary:CreateWindow(title)
     MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
     MainFrame.BorderSizePixel = 0
 
+    -- MainFrame Corner
+    MainFrameCorner.Parent = MainFrame
+    MainFrameCorner.CornerRadius = UDim.new(0, 10)
+
     -- TopBar
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
@@ -31,6 +39,10 @@ function UILibrary:CreateWindow(title)
     TopBar.BackgroundTransparency = 0.7
     TopBar.Size = UDim2.new(1, 0, 0, 40)
     TopBar.BorderSizePixel = 0
+
+    -- TopBar Corner
+    TopBarCorner.Parent = TopBar
+    TopBarCorner.CornerRadius = UDim.new(0, 10)
 
     -- Close Button
     CloseButton.Name = "CloseButton"
@@ -75,6 +87,10 @@ function UILibrary:CreateWindow(title)
     Sidebar.Position = UDim2.new(0, 0, 0, 40)
     Sidebar.BorderSizePixel = 0
 
+    -- Sidebar Corner
+    SidebarCorner.Parent = Sidebar
+    SidebarCorner.CornerRadius = UDim.new(0, 10)
+
     UIListLayout.Parent = Sidebar
     UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
@@ -86,6 +102,10 @@ function UILibrary:CreateWindow(title)
     ContentFrame.Size = UDim2.new(1, -150, 1, -40)
     ContentFrame.Position = UDim2.new(0, 150, 0, 40)
     ContentFrame.BorderSizePixel = 0
+
+    -- ContentFrame Corner
+    ContentFrameCorner.Parent = ContentFrame
+    ContentFrameCorner.CornerRadius = UDim.new(0, 10)
 
     -- Title Label
     TitleLabel.Name = "TitleLabel"
