@@ -1,19 +1,19 @@
 local UILibrary = {}
 
 function UILibrary:CreateWindow(title)
+    local UserInputService = game:GetService("UserInputService")
+    local dragging, dragInput, dragStart, startPos
+
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local MainFrameCorner = Instance.new("UICorner")
-    local MainFrameGradient = Instance.new("UIGradient")
     local TopBar = Instance.new("Frame")
     local TopBarCorner = Instance.new("UICorner")
-    local TopBarGradient = Instance.new("UIGradient")
     local TopBarBorder = Instance.new("Frame")
     local CloseButton = Instance.new("TextButton")
     local MinimizeButton = Instance.new("TextButton")
     local Sidebar = Instance.new("Frame")
     local SidebarCorner = Instance.new("UICorner")
-    local SidebarGradient = Instance.new("UIGradient")
     local SidebarBorder = Instance.new("Frame")
     local ContentFrame = Instance.new("Frame")
     local ContentFrameCorner = Instance.new("UICorner")
@@ -23,7 +23,7 @@ function UILibrary:CreateWindow(title)
     ScreenGui.Name = "CustomUILibrary"
     ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-    -- MainFrame (Acrylic Glass Effect)
+    -- MainFrame
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -36,14 +36,6 @@ function UILibrary:CreateWindow(title)
     MainFrameCorner.Parent = MainFrame
     MainFrameCorner.CornerRadius = UDim.new(0, 10)
 
-    -- MainFrame Gradient
-    MainFrameGradient.Parent = MainFrame
-    MainFrameGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(240, 240, 240)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200))
-    }
-    MainFrameGradient.Rotation = 90
-
     -- TopBar
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
@@ -55,14 +47,6 @@ function UILibrary:CreateWindow(title)
     -- TopBar Corner
     TopBarCorner.Parent = TopBar
     TopBarCorner.CornerRadius = UDim.new(0, 10)
-
-    -- TopBar Gradient
-    TopBarGradient.Parent = TopBar
-    TopBarGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(240, 240, 240)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200))
-    }
-    TopBarGradient.Rotation = 90
 
     -- TopBar Border
     TopBarBorder.Name = "TopBarBorder"
@@ -120,14 +104,6 @@ function UILibrary:CreateWindow(title)
     SidebarCorner.Parent = Sidebar
     SidebarCorner.CornerRadius = UDim.new(0, 10)
 
-    -- Sidebar Gradient
-    SidebarGradient.Parent = Sidebar
-    SidebarGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(240, 240, 240)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200))
-    }
-    SidebarGradient.Rotation = 90
-
     -- Sidebar Border
     SidebarBorder.Name = "SidebarBorder"
     SidebarBorder.Parent = Sidebar
@@ -160,6 +136,39 @@ function UILibrary:CreateWindow(title)
     TitleLabel.TextSize = 20
     TitleLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Dragging Logic
+    TopBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    TopBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            MainFrame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
 
     self.MainFrame = MainFrame
     self.Sidebar = Sidebar
